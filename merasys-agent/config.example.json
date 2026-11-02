@@ -1,0 +1,7 @@
+{
+  "url": "http://IP_MAY_109:8080",
+  "host": "192.168.1.239",
+  "token": "REPLACE_WITH_UNIQUE_RANDOM_TOKEN_FOR_239",
+  "interval_seconds": 60,
+  "allow_http": true
+}

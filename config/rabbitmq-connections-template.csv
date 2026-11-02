@@ -1,0 +1,2 @@
+Connection,Management URL,Username,Password,Vhost
+rabbit-prod,http://10.9.3.250:15672,monitor_user,REPLACE_WITH_REAL_PASSWORD,/

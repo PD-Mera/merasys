@@ -1,0 +1,70 @@
+name: merasys-core
+
+# The web setup works without PostgreSQL. All processes share bootstrap state/.
+# PostgreSQL URL and other runtime settings are entered in the web interface.
+x-core: &core
+  build: .
+  image: merasys-core:0.5.0
+  network_mode: host
+  env_file:
+    - .env
+  volumes:
+    - type: bind
+      source: ./monitor
+      target: /app/monitor
+      read_only: true
+      bind:
+        create_host_path: false
+    - type: bind
+      source: ./state
+      target: /app/state
+      read_only: false
+      bind:
+        create_host_path: true
+  restart: unless-stopped
+  init: true
+  read_only: true
+  tmpfs:
+    - /tmp:size=32m,mode=1777
+  cap_drop:
+    - ALL
+  security_opt:
+    - no-new-privileges:true
+  logging:
+    driver: json-file
+    options:
+      max-size: "10m"
+      max-file: "3"
+
+services:
+  init-db:
+    <<: *core
+    command: ["init-db"]
+    restart: "no"
+    profiles: ["tools"]
+
+  collector:
+    <<: *core
+    command: ["collector"]
+
+  web:
+    <<: *core
+    command: ["web"]
+
+  alerts:
+    <<: *core
+    command: ["alerts"]
+
+  rabbitmq-checker:
+    <<: *core
+    command: ["rabbitmq"]
+
+  prune:
+    <<: *core
+    entrypoint: ["python", "-c"]
+    command:
+      - |
+        import subprocess, sys, time
+        while True:
+            subprocess.run([sys.executable, '-m', 'monitor.cli', 'prune', '--days', '7'], check=False)
+            time.sleep(86400)

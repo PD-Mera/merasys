@@ -1,0 +1,15 @@
+.env
+.env.*
+!.env.example
+agent.env
+config.json
+git-update.json
+*.key
+*.pem
+*.previous
+__pycache__/
+*.pyc
+*.log
+.DS_Store
+.idea/
+.vscode/

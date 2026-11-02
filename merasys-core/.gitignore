@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.env
+state/
+*.sqlite3
+*.sqlite3-wal
+*.sqlite3-shm
+secrets/
+*.db
+*.egg-info/
+build/
+dist/
+.test-deps/
+.pytest-tmp*/
+*.dump
