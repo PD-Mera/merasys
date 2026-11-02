@@ -1,6 +1,6 @@
 # Đưa toàn hệ thống lên cùng một repo Git
 
-Agent là một folder trong repo chung với core và PostgreSQL, không init Git riêng trong folder agent. Làm theo [PUBLISH.md ở gốc repo](../PUBLISH.md). Git được khởi tạo trực tiếp tại thư mục ngoài cùng merasys:
+Agent là một folder trong repo chung với core và PostgreSQL, không init Git riêng trong folder agent. Làm theo [hướng dẫn publish chung](../merasys-core/PUBLISH.md). Git được khởi tạo trực tiếp tại thư mục ngoài cùng merasys:
 
 ```bash
 git init -b main

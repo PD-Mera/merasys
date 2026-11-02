@@ -1,5 +1,7 @@
 # Nâng cấp uptime/downtime và bảng dịch vụ
 
+> Frontend hiện đã chuyển sang React trong `frontend/`. Các đường dẫn `monitor/*.html` trong hướng dẫn nâng cấp lịch sử bên dưới thuộc bản cũ; dùng [FRONTEND.md](FRONTEND.md) cho build/mount giao diện hiện tại. Các bước backend và sao lưu dữ liệu chỉ áp dụng theo tính năng cần nâng cấp.
+
 ## Nội dung
 
 - Lịch sử xác nhận UP/DOWN/UNKNOWN/DISABLED cho từng mục giám sát, gồm Compose và server. Không suy diễn quá khứ từ các sample cũ.

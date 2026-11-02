@@ -2,14 +2,14 @@ import ipaddress
 import re
 import secrets
 import sqlite3
-from pathlib import Path
 from urllib.parse import urlsplit
 
 from fastapi import Depends, HTTPException, Request
-from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from pydantic import BaseModel, Field
 
 from . import control, configuration
+from .frontend import page
 
 
 class Login(BaseModel):
@@ -25,11 +25,18 @@ class ConfigPatch(BaseModel):
 class AgentHost(BaseModel):
     host: str = Field(max_length=45)
     replace: bool = False
+    previous_host: str | None = Field(default=None, max_length=45)
+
+
+class AgentTokenValue(BaseModel):
+    previous_host: str | None = Field(default=None, max_length=45)
+    token: str = Field(min_length=32, max_length=256, pattern=r"^[A-Za-z0-9_-]+$")
+    replace: bool = False
 
 
 class PasswordChange(BaseModel):
     current: str = Field(min_length=1, max_length=256)
-    new: str = Field(min_length=12, max_length=256)
+    new: str = Field(min_length=1, max_length=256)
 
 
 def csrf(request):
@@ -51,10 +58,6 @@ def authorize(request: Request):
         raise HTTPException(401, "Phiên đăng nhập đã hết hạn")
     if request.method not in {"GET", "HEAD"}:
         csrf(request)
-
-
-def auth_html():
-    return HTMLResponse(Path(__file__).with_name("auth.html").read_text(encoding="utf-8"))
 
 
 def session_response(request):
@@ -85,8 +88,8 @@ def attach(app, settings):
         address = request.client.host if request.client else "unknown"
         if not control.allow_login_attempt(address):
             raise HTTPException(429, "Thử quá nhiều lần; vui lòng chờ 15 phút")
-        if not re.fullmatch(r"[A-Za-z0-9_.@-]{3,64}", body.username) or len(body.password) < 12:
-            raise HTTPException(422, "Tên đăng nhập dùng chữ/số/_.@-; mật khẩu ít nhất 12 ký tự")
+        if not re.fullmatch(r"[A-Za-z0-9_.@-]{3,64}", body.username):
+            raise HTTPException(422, "Tên đăng nhập dùng chữ/số/_.@-")
         try:
             control.register(body.username, body.password)
         except sqlite3.IntegrityError:
@@ -125,7 +128,7 @@ def attach(app, settings):
     def settings_page(request: Request):
         if not control.authenticated(request.cookies.get(control.COOKIE)):
             return RedirectResponse("/", status_code=303)
-        return HTMLResponse(Path(__file__).with_name("settings.html").read_text(encoding="utf-8"))
+        return page()
 
     @app.get("/api/settings", dependencies=[Depends(authorize)])
     def get_settings():
@@ -145,15 +148,42 @@ def attach(app, settings):
     def agent_token(body: AgentHost):
         try:
             ipaddress.ip_address(body.host)
+            if body.previous_host is not None:
+                ipaddress.ip_address(body.previous_host)
         except ValueError:
             raise HTTPException(422, "IP không hợp lệ") from None
         token = secrets.token_urlsafe(32)
         try:
-            control.assign_agent_token(body.host, token, body.replace)
+            control.assign_agent_token(body.host, token, body.replace, body.previous_host)
         except ValueError as exc:
             raise HTTPException(409, str(exc)) from None
         settings.reload()
         return {"host": body.host, "token": token}
+
+    @app.put("/api/settings/agent-token/{host}", dependencies=[Depends(authorize)])
+    def save_agent_token(host: str, body: AgentTokenValue):
+        try:
+            ipaddress.ip_address(host)
+            if body.previous_host is not None:
+                ipaddress.ip_address(body.previous_host)
+        except ValueError:
+            raise HTTPException(422, "IP không hợp lệ") from None
+        try:
+            control.assign_agent_token(host, body.token, body.replace, body.previous_host)
+        except ValueError as exc:
+            raise HTTPException(409, str(exc)) from None
+        settings.reload()
+        return {"ok": True}
+
+    @app.delete("/api/settings/agent-token/{host}", dependencies=[Depends(authorize)])
+    def delete_agent_token(host: str):
+        try:
+            ipaddress.ip_address(host)
+        except ValueError:
+            raise HTTPException(422, "IP không hợp lệ") from None
+        control.remove_agent_token(host)
+        settings.reload()
+        return {"ok": True}
 
     @app.post("/api/settings/sync", dependencies=[Depends(authorize)])
     def sync_now():

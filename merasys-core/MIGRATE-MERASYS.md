@@ -1,5 +1,7 @@
 # Chuyển toàn hệ thống sang Merasys
 
+> Frontend hiện đã chuyển sang React trong `frontend/`. Các đường dẫn `monitor/*.html` trong hướng dẫn nâng cấp lịch sử bên dưới thuộc bản cũ; dùng [FRONTEND.md](FRONTEND.md) cho build/mount giao diện hiện tại. Các bước backend và sao lưu dữ liệu chỉ áp dụng theo tính năng cần nâng cấp.
+
 > Cấu hình core hiện đã chuyển sang web theo [WEB-CONFIG.md](WEB-CONFIG.md): chỉ WEB_HOST/WEB_PORT ở env, không còn dashboard token hoặc đọc secrets để chạy. Các bước giữ .env/secrets bên dưới chỉ để sao lưu và nhập lại giá trị trên UI. Việc chuyển tên agent/unit và giữ data PostgreSQL vẫn áp dụng.
 
 Tên mới dùng đồng bộ cho repo, folder triển khai, package/CLI, Docker Compose/image, giao diện và systemd agent:

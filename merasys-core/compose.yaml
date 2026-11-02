@@ -4,7 +4,10 @@ name: merasys-core
 # PostgreSQL URL and other runtime settings are entered in the web interface.
 x-core: &core
   build: .
-  image: merasys-core:0.5.0
+  image: merasys-core:0.6.0
+  depends_on:
+    frontend-build:
+      condition: service_completed_successfully
   network_mode: host
   env_file:
     - .env
@@ -12,6 +15,18 @@ x-core: &core
     - type: bind
       source: ./monitor
       target: /app/monitor
+      read_only: true
+      bind:
+        create_host_path: false
+    - type: bind
+      source: ./frontend/dist
+      target: /app/frontend/dist
+      read_only: true
+      bind:
+        create_host_path: true
+    - type: bind
+      source: ../merasys-agent
+      target: /app/agent-source
       read_only: true
       bind:
         create_host_path: false
@@ -37,6 +52,30 @@ x-core: &core
       max-file: "3"
 
 services:
+  frontend-build:
+    build:
+      context: .
+      target: frontend-build
+    image: merasys-frontend-build:0.6.0
+    network_mode: none
+    user: "${FRONTEND_UID:-0}:${FRONTEND_GID:-0}"
+    volumes:
+      - type: bind
+        source: ./frontend/dist
+        target: /output
+        bind:
+          create_host_path: true
+    entrypoint: ["sh", "-ec"]
+    # Keep previous hashed assets for clients with an older index open.
+    # Publish index last using an atomic rename on the same filesystem.
+    command:
+      - |
+        mkdir -p /output/assets
+        cp -R /build/dist/assets/. /output/assets/
+        cp /build/dist/index.html /output/.index.html.next
+        mv /output/.index.html.next /output/index.html
+    restart: "no"
+
   init-db:
     <<: *core
     command: ["init-db"]

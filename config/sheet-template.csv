@@ -1,6 +1,0 @@
-Bật giám sát,Dự án,Tên dịch vụ,IP server,Type,Người phụ trách,Tên compose,Tên queue,RabbitMQ connection,Queue config,Server config,Note
-TRUE,,Máy chủ 239,10.9.3.239,server,Tuấn,,,,,"{""disks"":[{""path"":""/"",""min_free_gb"":20}]}",Heartbeat server
-TRUE,,Máy chủ 241,10.9.3.241,server,"Nghĩa, Tuấn",,,,,"{""disks"":[{""path"":""/"",""min_free_gb"":20}]}",Heartbeat server
-TRUE,VisualSense,Tra soát vi phạm truyền hình,10.9.3.241,compose,Nghĩa,visual_sense,,,,,Theo dõi toàn bộ Compose
-TRUE,SocialBeat,Leader Detection Alert,10.9.3.241,compose,Đông,icomm-3-241__socialbeat_leader-detection,,,,,Cảnh báo hình ảnh lãnh đạo
-TRUE,SocialBeat,Queue nhận video,10.9.3.250,rabbitmq,Đông,,video_queue,rabbit-prod,"{""min_consumers"":1,""alert_threshold"":1000}",,Phục vụ Leader Detection

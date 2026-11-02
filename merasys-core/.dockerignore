@@ -1,3 +1,7 @@
 *
 !Dockerfile
 !pyproject.toml
+!frontend/
+!frontend/**
+frontend/node_modules/
+frontend/dist/

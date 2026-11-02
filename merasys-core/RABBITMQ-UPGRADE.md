@@ -1,5 +1,7 @@
 # RabbitMQ queue monitor từ core
 
+> Frontend hiện đã chuyển sang React trong `frontend/`. Các đường dẫn `monitor/*.html` trong hướng dẫn nâng cấp lịch sử bên dưới thuộc bản cũ; dùng [FRONTEND.md](FRONTEND.md) cho build/mount giao diện hiện tại. Các bước backend và sao lưu dữ liệu chỉ áp dụng theo tính năng cần nâng cấp.
+
 > Bản hiện tại dùng [WEB-CONFIG.md](WEB-CONFIG.md): DB URL, chu kỳ quét và các tham số core đặt trên web, không nhập runtime settings vào env nữa. Queue config và RabbitMQConnections vẫn ở Sheet như bên dưới.
 
 Agent không thay đổi. Worker `rabbitmq-checker` thuộc compose core gọi Management API, ghi kết quả và lịch sử vào PostgreSQL. Worker alerts đọc DB để cảnh báo như Compose. Không publish, consume, lấy message hoặc sửa queue.

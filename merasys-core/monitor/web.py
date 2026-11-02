@@ -1,7 +1,6 @@
 import json
 from uuid import uuid4
 from datetime import timedelta
-from pathlib import Path
 from urllib.parse import quote, urlsplit
 
 from fastapi import Depends, FastAPI, HTTPException, Request
@@ -24,10 +23,13 @@ class TestAlertRequest(BaseModel):
 
 def create_app(settings, sessions):
     app = FastAPI(title="Merasys", docs_url=None, redoc_url=None, openapi_url=None)
-    from .setup_web import attach, authorize, auth_html
+    from .setup_web import attach, authorize
+    from .frontend import attach_assets, page
     from . import control
     attach(app, settings)
-    dashboard_html = Path(__file__).with_name("dashboard.html").read_text(encoding="utf-8")
+    attach_assets(app)
+    from .agent_install import attach as attach_agent_install
+    attach_agent_install(app)
     from .ingest import router
     app.include_router(router(settings, sessions))
 
@@ -199,9 +201,9 @@ def create_app(settings, sessions):
     @app.get("/", response_class=HTMLResponse)
     def dashboard(request: Request):
         if not control.authenticated(request.cookies.get(control.COOKIE)):
-            return auth_html()
+            return page()
         if not settings.ready:
             return RedirectResponse("/settings", status_code=303)
-        return dashboard_html
+        return page()
 
     return app

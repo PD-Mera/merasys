@@ -1,5 +1,7 @@
 # Giám sát dung lượng còn trống theo GB
 
+> Frontend hiện đã chuyển sang React trong `frontend/`. Các đường dẫn `monitor/*.html` trong hướng dẫn nâng cấp lịch sử bên dưới thuộc bản cũ; dùng [FRONTEND.md](FRONTEND.md) cho build/mount giao diện hiện tại. Các bước backend và sao lưu dữ liệu chỉ áp dụng theo tính năng cần nâng cấp.
+
 > Core hiện cấu hình bằng web theo [WEB-CONFIG.md](WEB-CONFIG.md), env chỉ WEB_HOST/WEB_PORT. Cập nhật/lưu DB và token agent qua UI trước; các tham chiếu env/secrets cũ trong hướng dẫn nâng cấp không thay thế luồng mới. Server config và đo dung lượng trên agent giữ nguyên.
 
 Agent đo filesystem trên Linux; core lưu số liệu/các bộ đếm trong DB và worker alerts cảnh báo Telegram. Không kiểm tra SMART, không ghi file thử vào ổ đĩa, không yêu cầu thư viện Python mới. 1 GB = 1.000.000.000 byte; có thể khác số GiB trong một số công cụ Linux. Dung lượng sử dụng được lấy từ f_bavail thay vì phần trống dự phòng chỉ dành cho root; tham khảo https://docs.python.org/3/library/os.html#os.statvfs.

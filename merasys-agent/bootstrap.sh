@@ -3,9 +3,12 @@
 set -euo pipefail
 umask 077
 [[ "$(id -u)" == 0 ]] || { echo 'Chạy bootstrap bằng sudo bash.' >&2; exit 1; }
-[[ "$#" -ge 1 && "$#" -le 2 ]] || { echo 'Dùng: bootstrap.sh REPO_URL [BRANCH]' >&2; exit 1; }
+[[ "$#" -ge 1 ]] || { echo 'Dùng: bootstrap.sh REPO_URL [BRANCH] [--url URL --server IP --token TOKEN]' >&2; exit 1; }
 repo_url="$1"
-branch="${2:-main}"
+shift
+branch=main
+if [[ "$#" -gt 0 && "$1" != --* ]]; then branch="$1"; shift; fi
+install_args=("$@")
 command -v systemctl >/dev/null 2>&1 || { echo 'Server phải chạy Linux/systemd.' >&2; exit 1; }
 if ! command -v git >/dev/null 2>&1 || [[ ! -x /usr/bin/python3 ]] || ! command -v flock >/dev/null 2>&1; then
     if command -v apt-get >/dev/null 2>&1; then
@@ -50,7 +53,7 @@ for name in install.sh monitor-agent.py merasys-agent.service git-update.sh; do
     [[ -f "$agent_dir/$name" ]] || { echo "Repo thiếu merasys-agent/$name" >&2; exit 1; }
 done
 [[ ! -e "$agent_dir/.env" ]] || { echo 'Repo chứa .env thật; bỏ cấu hình riêng khỏi repo trước khi bootstrap.' >&2; exit 1; }
-bash "$agent_dir/install.sh"
+bash "$agent_dir/install.sh" "${install_args[@]}"
 bash "$agent_dir/git-update.sh" --setup "$repo_url" "$branch" merasys-agent
 echo 'Đã cài Merasys agent và cấu hình updater.'
 echo 'Cập nhật lần sau: sudo merasys-agent-update'

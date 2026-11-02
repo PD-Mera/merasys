@@ -135,17 +135,36 @@ def save_configuration(values, expected):
         connection.execute("INSERT INTO configuration VALUES (1, ?) ON CONFLICT(id) DO UPDATE SET data=excluded.data", (json.dumps(values, ensure_ascii=False),))
 
 
-def assign_agent_token(host, token, replace):
+def assign_agent_token(host, token, replace, previous_host=None):
     with database() as connection:
         connection.execute("BEGIN IMMEDIATE")
         row = connection.execute("SELECT data FROM configuration WHERE id=1").fetchone()
         config = json.loads(row["data"]) if row else {}
         tokens = dict(config.get("agent_tokens", {}))
+        moving = previous_host is not None and previous_host != host
+        if previous_host is not None and previous_host not in tokens:
+            raise ValueError("IP cũ không còn tồn tại; tải lại cấu hình rồi thử lại")
+        if moving and host in tokens:
+            raise ValueError("IP mới đã có token; không ghi đè máy chủ khác")
         if host in tokens and not replace:
             raise ValueError("IP đã có token; cần xác nhận thay token")
-        if host not in tokens and len(tokens) >= 1000:
+        if host not in tokens and not moving and len(tokens) >= 1000:
             raise ValueError("Chỉ cho phép tối đa 1000 token agent")
+        if moving:
+            del tokens[previous_host]
         tokens[host] = token
+        config["agent_tokens"] = tokens
+        connection.execute("INSERT INTO configuration VALUES (1, ?) ON CONFLICT(id) DO UPDATE SET data=excluded.data", (json.dumps(config, ensure_ascii=False),))
+
+
+
+def remove_agent_token(host):
+    with database() as connection:
+        connection.execute("BEGIN IMMEDIATE")
+        row = connection.execute("SELECT data FROM configuration WHERE id=1").fetchone()
+        config = json.loads(row["data"]) if row else {}
+        tokens = dict(config.get("agent_tokens", {}))
+        tokens.pop(host, None)
         config["agent_tokens"] = tokens
         connection.execute("INSERT INTO configuration VALUES (1, ?) ON CONFLICT(id) DO UPDATE SET data=excluded.data", (json.dumps(config, ensure_ascii=False),))
 

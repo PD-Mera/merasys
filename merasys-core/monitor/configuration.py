@@ -67,8 +67,9 @@ def public(settings):
     if config["database_url"]:
         url = make_url(config["database_url"])
         database = f"{url.host}:{url.port or 5432}/{url.database} · {url.username or ''}"
-    return {"values": {key:value for key,value in config.items() if key not in SECRET_KEYS},
+    return {"values": {key:value for key,value in config.items() if key not in SECRET_KEYS or key == "database_url"},
             "configured": {key: bool(config[key]) for key in SECRET_KEYS}, "database": database,
+            "agent_tokens": dict(config["agent_tokens"]),
             "agent_hosts": sorted(config["agent_tokens"]), "web": {"host": settings.web_host, "port": settings.web_port}}
 
 

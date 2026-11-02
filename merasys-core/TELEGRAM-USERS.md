@@ -1,5 +1,7 @@
 # Mention người phụ trách trên Telegram
 
+> Frontend hiện đã chuyển sang React trong `frontend/`. Các đường dẫn `monitor/*.html` trong hướng dẫn nâng cấp lịch sử bên dưới thuộc bản cũ; dùng [FRONTEND.md](FRONTEND.md) cho build/mount giao diện hiện tại. Các bước backend và sao lưu dữ liệu chỉ áp dụng theo tính năng cần nâng cấp.
+
 > Token bot/chat/topic hiện đặt trên màn Cấu hình theo [WEB-CONFIG.md](WEB-CONFIG.md), không dùng env Telegram hoặc Basic Auth. Các API quản trị dùng cookie đăng nhập và X-Merasys-Request: 1; tab TelegramUsers và logic mention giữ nguyên.
 
 Tạo tab tên chính xác `TelegramUsers` trong cùng Google spreadsheet đang dùng. Không đổi `GOOGLE_WORKSHEET`: biến đó vẫn trỏ tới tab khai báo giám sát. Hỗ trợ bảng hai cột cũ và bảng ba cột có thêm Telegram username ở cuối.

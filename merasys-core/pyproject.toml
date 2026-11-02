@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "merasys"
-version = "0.5.0"
+version = "0.6.0"
 description = "Sheet-configured agent/Docker monitoring with PostgreSQL-backed alerts"
 requires-python = ">=3.11"
 dependencies = [
@@ -25,6 +25,3 @@ include = ["monitor*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-
-[tool.setuptools.package-data]
-monitor = ["*.html"]

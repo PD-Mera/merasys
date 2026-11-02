@@ -24,3 +24,7 @@ config.json
 *.key
 *.pem
 *.previous
+
+# Frontend build dependencies and output
+node_modules/
+*.tsbuildinfo

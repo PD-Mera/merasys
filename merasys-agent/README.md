@@ -70,4 +70,14 @@ Agent mới hỗ trợ dung lượng filesystem theo GB: nhận đường dẫn 
 
 ## Repo chung cho toàn hệ thống
 
-Agent nằm ở merasys-agent trong cùng repo với core và PostgreSQL. AGENT_SUBDIR khi setup git-update.sh là `merasys-agent`, không phải `.`. Xem [PUBLISH.md](PUBLISH.md) và PUBLISH.md ở gốc dự án. Không commit cấu hình thật. Chưa chạy test trên máy phát triển theo yêu cầu người dùng.
+Agent nằm ở merasys-agent trong cùng repo với core và PostgreSQL. AGENT_SUBDIR khi setup git-update.sh là `merasys-agent`, không phải `.`. Xem [PUBLISH.md](PUBLISH.md) và `merasys-core/PUBLISH.md`. Không commit cấu hình thật. Chưa chạy test trên máy phát triển theo yêu cầu người dùng.
+
+## Cài agent một lệnh, không nhập lại
+
+Trên trang Cấu hình, lưu IP/token rồi bấm **Sao chép lệnh cài agent**. Dán lệnh vào terminal của server cần giám sát. Core phục vụ script và bundle mã agent trực tiếp, không cần GitHub public hoặc quyền Git trên server. Ví dụ (thay URL/IP/token):
+
+```bash
+curl -fsSL 'http://IP_CORE:21707/agent/install.sh' | sudo bash -s -- --url 'http://IP_CORE:21707' --server '10.9.3.239' --token 'TOKEN_DA_LUU_TREN_CORE'
+```
+
+Script cần Linux/systemd, sudo và curl; tự cài Python3/tar nếu thiếu. Các tham số truyền vào cập nhật cấu hình agent kể cả đã cài; lưu bản cũ tại `/etc/merasys-agent/agent.env.previous`. Token nằm trong lệnh đã sao chép, vì vậy lệnh này cũng là thông tin đăng nhập của agent. Chế độ `install.sh` không có tham số vẫn giữ cách nhập tương tác/cấu hình cũ.

@@ -9,15 +9,15 @@ merasys/
   merasys-core/
   merasys-agent/
   merasys-postgres-db/
-  monitor/                     # bản source gốc
-  config/
-  tests/                       # source tests, không chạy trong bước chuẩn bị
   README.md
-  PUBLISH.md
-  ...các file triển khai/tài liệu ở gốc
+  AGENTS.md
+  .gitignore
+  .gitattributes
 ```
 
 Repo được khởi tạo trực tiếp tại gốc dự án merasys. Không có bộ source trung gian. .gitignore loại env thật, secrets, state, dữ liệu PostgreSQL và cache; .gitattributes chuẩn hóa LF cho Linux.
+
+Mã nguồn `monitor/`, `tests/`, cấu hình mẫu `config/`, Dockerfile, Compose và tài liệu core nằm trong `merasys-core/`. Không lưu bản sao hoặc symlink ở gốc repo. Không chạy test trên máy này.
 
 Remote dùng https://github.com/PD-Mera/merasys.git. Chạy các lệnh Git tại **gốc dự án merasys**:
 
@@ -46,7 +46,7 @@ sudo merasys-agent-update
 
 ## Core và DB
 
-Core vẫn triển khai từ merasys-core; DB từ merasys-postgres-db, độc lập dữ liệu. Không chạy nhầm compose.yaml ở gốc khi đang làm theo hướng dẫn của một bộ triển khai. Đổi code core thì mount code/restart theo hướng dẫn từng thay đổi; migrate DB khi có yêu cầu init-db. Lệnh update agent không tự cập nhật core hoặc DB.
+Core vẫn triển khai từ merasys-core; DB từ merasys-postgres-db, độc lập dữ liệu. Chạy Docker Compose trong đúng thư mục triển khai; gốc repo không có compose.yaml. Đổi code core thì mount code/restart theo hướng dẫn từng thay đổi; migrate DB khi có yêu cầu init-db. Lệnh update agent không tự cập nhật core hoặc DB.
 
 Sửa và commit trực tiếp tại repo gốc. Không cần chép lại code sang folder khác trước khi commit.
 

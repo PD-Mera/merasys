@@ -10,7 +10,7 @@ Hỗ trợ GitHub, GitLab hoặc Git nội bộ qua HTTPS/SSH. Không cần Dock
 
 ## Đưa code lên repo
 
-Dùng một repo chung chứa merasys-core, merasys-agent và merasys-postgres-db. File agent nằm ở merasys-agent/monitor-agent.py. Chỉ commit code, tài liệu và mẫu cấu hình; không commit .env, agent.env, config.json thật, token hoặc private key. Xem PUBLISH.md ở gốc repo; gitignore không tự xóa secrets đã được Git track từ trước.
+Dùng một repo chung chứa merasys-core, merasys-agent và merasys-postgres-db. File agent nằm ở merasys-agent/monitor-agent.py. Chỉ commit code, tài liệu và mẫu cấu hình; không commit .env, agent.env, config.json thật, token hoặc private key. Xem `merasys-core/PUBLISH.md`; gitignore không tự xóa secrets đã được Git track từ trước.
 
 Quy trình sau này: sửa agent trên máy phát triển → commit/push vào nhánh đã chọn → chạy lệnh update trên từng server. Server không tự cập nhật khi push, không cần webhook hoặc timer.
 

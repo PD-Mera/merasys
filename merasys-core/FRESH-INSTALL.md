@@ -32,7 +32,7 @@ WEB_HOST=0.0.0.0
 WEB_PORT=21707
 ```
 
-Mở http://IP_109:21707. Khi chưa có tài khoản, tạo tài khoản quản trị đầu tiên (mật khẩu tối thiểu 12 ký tự). Từ lần sau chỉ hiện đăng nhập, không cho tạo tài khoản thứ hai. Không còn Basic Auth/dashboard token.
+Mở http://IP_109:21707. Khi chưa có tài khoản, tạo tài khoản quản trị đầu tiên (mật khẩu tùy chọn, không để trống). Từ lần sau chỉ hiện đăng nhập, không cho tạo tài khoản thứ hai. Không còn Basic Auth/dashboard token.
 
 Web vẫn mở được khi chưa cấu hình hoặc DB đang lỗi. Worker chờ cấu hình, không phải chạy init-db trước. Dữ liệu tài khoản/cấu hình bootstrap nằm trong state/ cạnh compose.yaml; dữ liệu giám sát vẫn ở PostgreSQL.
 
@@ -75,3 +75,15 @@ Dashboard sẽ có dữ liệu sau các vòng report. Có thể dùng Thử cả
 Server config giám sát dung lượng GB, Queue config cho ngưỡng RabbitMQ vẫn khai báo trên Sheet như các hướng dẫn tương ứng. Những cấu hình trước đây ở .env được thay bằng web; tham chiếu .env/secrets/dashboard token trong tài liệu nâng cấp cũ đã được thay thế bởi WEB-CONFIG.md.
 
 Sao lưu state/ (khi core đã dừng để sao chép nhất quán) cùng PostgreSQL. Không commit state, env, data hoặc secret lên Git. HTTP chỉ dùng trong mạng riêng tin cậy/VPN; có thể đặt HTTPS reverse proxy. Chưa chạy test/build/cài gói hoặc gọi server thật trên máy phát triển.
+
+Frontend dùng React 19.3, TypeScript 5.9, Vite 7.3 trên Node 22; xem [FRONTEND.md](FRONTEND.md) để build và cập nhật giao diện mà không restart backend.
+
+## Cài agent một lệnh, không nhập lại
+
+Trên trang Cấu hình, lưu IP/token rồi bấm **Sao chép lệnh cài agent**. Dán lệnh vào terminal của server cần giám sát. Core phục vụ script và bundle mã agent trực tiếp, không cần GitHub public hoặc quyền Git trên server. Ví dụ (thay URL/IP/token):
+
+```bash
+curl -fsSL 'http://IP_CORE:21707/agent/install.sh' | sudo bash -s -- --url 'http://IP_CORE:21707' --server '10.9.3.239' --token 'TOKEN_DA_LUU_TREN_CORE'
+```
+
+Script cần Linux/systemd, sudo và curl; tự cài Python3/tar nếu thiếu. Các tham số truyền vào cập nhật cấu hình agent kể cả đã cài; lưu bản cũ tại `/etc/merasys-agent/agent.env.previous`. Token nằm trong lệnh đã sao chép, vì vậy lệnh này cũng là thông tin đăng nhập của agent. Chế độ `install.sh` không có tham số vẫn giữ cách nhập tương tác/cấu hình cũ.

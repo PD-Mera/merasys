@@ -1,6 +1,6 @@
 # Merasys
 
-**Bản hiện tại:** core chỉ để WEB_HOST/WEB_PORT trong env. Web tự hiện đăng ký lần đầu, sau đó đăng nhập; chỉ một tài khoản. Các tham số còn lại nhập trên màn Cấu hình, không dùng dashboard token. Xem [WEB-CONFIG.md](WEB-CONFIG.md).
+**Bản hiện tại: 0.6.0.** core chỉ để WEB_HOST/WEB_PORT trong env. Web tự hiện đăng ký lần đầu, sau đó đăng nhập; chỉ một tài khoản. Các tham số còn lại nhập trên màn Cấu hình, không dùng dashboard token. Xem [WEB-CONFIG.md](WEB-CONFIG.md).
 
 Cài mới từ đầu, gồm agent cài một dòng bash: [FRESH-INSTALL.md](FRESH-INSTALL.md).
 
@@ -74,7 +74,7 @@ Nếu container còn tồn tại sẽ được tự khám phá lại.
 
 ## Trạng thái và cảnh báo
 
-Dashboard có tổng quan, thẻ máy chủ và bảng lọc theo dự án/trạng thái. Chọn máy chủ để lọc dịch vụ; tìm bằng tên, IP, người phụ trách hoặc Note. Chọn đối tượng để mở chi tiết kết quả và các service trong Compose. Dữ liệu cập nhật mỗi 30 giây qua API, giữ nguyên bộ lọc; khi mất API sẽ có thông báo và các kết quả quá hạn chuyển Chưa rõ. Thời gian hiển thị theo DISPLAY_TIMEZONE. Nút Mở khai báo dẫn đến Sheet cấu hình. Giao diện nằm trong monitor/dashboard.html được mount từ host; sửa file rồi restart web, không cần build. Không cần npm, CDN hoặc tải font bên ngoài.
+Dashboard có tổng quan, thẻ máy chủ và bảng lọc theo dự án/trạng thái. Chọn máy chủ để lọc dịch vụ; tìm bằng tên, IP, người phụ trách hoặc Note. Chọn đối tượng để mở chi tiết kết quả và các service trong Compose. Dữ liệu cập nhật mỗi 30 giây qua API, giữ nguyên bộ lọc; khi mất API sẽ có thông báo và các kết quả quá hạn chuyển Chưa rõ. Thời gian hiển thị theo DISPLAY_TIMEZONE. Nút Mở khai báo dẫn đến Sheet cấu hình. Giao diện React 19.3/TypeScript 5.9 nằm trong frontend/src/, build bằng Vite 7.3 trên Node 22. Thư mục frontend/dist/ được mount từ host; build lại frontend rồi reload trình duyệt, không cần restart backend. Xem [FRONTEND.md](FRONTEND.md). Không dùng CDN hoặc tải font bên ngoài.
 
 - Agent gửi mỗi 60 giây. Server UP khi nhận heartbeat; quá 180 giây không nhận thì cảnh báo mất liên lạc, không khẳng định máy đã tắt. Cần 2 heartbeat mới sau gián đoạn để phục hồi.
 - Container/Compose UP khi running; sau 3 mẫu lỗi liên tiếp thì cảnh báo, sau 2 mẫu tốt thì phục hồi. Bộ đếm theo báo cáo, không theo lượt worker đọc DB.
@@ -94,8 +94,10 @@ Bảng có checkbox chọn nhiều và nút Xóa mục đã chọn, tối đa 20
 
 ## Nâng cấp, sao lưu và nghiệm thu
 
-Code trong monitor/ được bind mount chỉ đọc vào /app/monitor. Sửa code: chép file rồi docker compose restart web collector alerts prune; chỉ sửa giao diện thì restart web. Chỉ build lại khi đổi thư viện trong pyproject.toml hoặc Dockerfile. Nếu thay schema: sao lưu DB, down core, chạy docker compose run --rm init-db rồi docker compose up -d; không cần build nếu không đổi thư viện. Xem DOCKER-SETUP.md để áp dụng cấu hình mount lần đầu. Init tạo bảng mới và thêm các cột Note/display_name nếu thiếu, không phải công cụ migration tổng quát. Chuyển DB bằng dump/restore theo README DB, sửa DATABASE_URL và recreate core. Chuyển core cần chuyển cả secrets; đổi URL API thì sửa config agent. Không copy thư mục data khi DB đang chạy để coi là backup nhất quán.
+Code trong monitor/ được bind mount chỉ đọc vào /app/monitor. Sửa Python: chép file rồi restart các dịch vụ dùng module đó. Chỉ sửa giao diện: build frontend rồi reload trình duyệt theo [FRONTEND.md](FRONTEND.md). Chỉ build lại image backend khi đổi thư viện Python hoặc Dockerfile; lần đầu chuyển sang React cần build/recreate để áp dụng mount và route mới. Nếu thay schema: sao lưu DB, down core, chạy docker compose run --rm init-db rồi docker compose up -d; không cần build nếu không đổi thư viện. Xem DOCKER-SETUP.md để áp dụng cấu hình mount lần đầu. Init tạo bảng mới và thêm các cột Note/display_name nếu thiếu, không phải công cụ migration tổng quát. Chuyển DB bằng dump/restore theo README DB, sửa DATABASE_URL và recreate core. Chuyển core cần chuyển cả secrets; đổi URL API thì sửa config agent. Không copy thư mục data khi DB đang chạy để coi là backup nhất quán.
 
 Nghiệm thu trên môi trường thử: dừng/chạy lại container, lỗi replica, service mất/redeploy/thêm mới, dừng agent, Docker query lỗi, quyền Sheet lỗi, Telegram lỗi, bật/tắt dòng và kiểm tra Note/nhiều dự án. Giữ một agent mỗi máy để bộ đếm đúng.
 
 Các kiểm thử cũ chỉ áp dụng trước các cập nhật gần đây. Theo yêu cầu hiện tại, không chạy test trên máy này; phần uptime/lazy rendering mới chưa nghiệm thu Docker/PostgreSQL thật. Xem UPTIME-UPGRADE.md để nâng schema trước khi chạy. Source tests nằm ở tests/; agent folder đặt ngang hàng core khi chạy các tests liên quan script.
+
+Frontend React và hướng dẫn triển khai: [FRONTEND.md](FRONTEND.md). PostgreSQL vẫn lưu dữ liệu giám sát, SQLite trong state/ vẫn lưu tài khoản, phiên và cấu hình; không đổi schema vì chuyển frontend.

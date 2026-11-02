@@ -15,3 +15,7 @@ dist/
 .test-deps/
 .pytest-tmp*/
 *.dump
+
+# Frontend build dependencies and output
+node_modules/
+*.tsbuildinfo

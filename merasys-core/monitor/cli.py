@@ -22,8 +22,8 @@ def main():
     if args.command == "reset-password":
         from getpass import getpass
         from .control import reset_password
-        password = getpass("Mật khẩu mới (12–256 ký tự): ")
-        if not 12 <= len(password) <= 256 or password != getpass("Nhập lại: "):
+        password = getpass("Mật khẩu mới: ")
+        if not 1 <= len(password) <= 256 or password != getpass("Nhập lại: "):
             raise SystemExit("Mật khẩu không hợp lệ hoặc không khớp")
         reset_password(password)
         print("Đã đổi mật khẩu và kết thúc mọi phiên đăng nhập; cấu hình được giữ nguyên")
